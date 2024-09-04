@@ -12,13 +12,13 @@ from filemanager.hashcheker import HashChecker
 
 '''
 @author: Giovanni SCAFETTA
-@version: 0.0.4
+@version: 0.0.5
 @description: This script is realized to syncronize two folders.
 @license: GLPv3
 '''
 
 
-VERSION = "0.0.4"
+VERSION = "0.0.5"
 
 
 def parse_arguments():
@@ -89,6 +89,7 @@ def main():
       logging.info("Starting the synchronization process...")
       start_time = time.time()  # Record the start time
       src_files = list_files_recursively(args.src)
+      
       if args.delete or args.delete_after:
         dst_files = list_files_recursively(args.dst)
       else:
