@@ -71,7 +71,7 @@ class HashChecker:
       """
       # Check if the second file path is provided
       if not self.file_path_b:
-          print("Second file path is not provided.")
+          logging.error("Second file path is not provided.")
           return False
 
       # Select the hash function based on hash_type

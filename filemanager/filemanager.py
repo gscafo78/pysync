@@ -32,6 +32,7 @@ def src2dst(src_file, src_dir, dst_dir):
   '''
   Converts a source file path to a destination file path.
   '''
+  logging.debug(f"Converts a source file path to a destination file path. {src_file}")
   file_part = split_path(src_file, src_dir)
   return f"{dst_dir}/{file_part}"
         
