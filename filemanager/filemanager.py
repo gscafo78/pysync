@@ -192,7 +192,7 @@ class FileManager:
                     with tqdm(total=file_size, 
                               unit='B', 
                               unit_scale=True, 
-                              desc=f"{self.dst_file}", 
+                              desc=f"{self.dst_file.split('/')[-1]}", 
                               unit_divisor=1024) as pbar:
                             #   ncols=200) as pbar:
                         
