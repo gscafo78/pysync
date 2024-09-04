@@ -3,7 +3,7 @@
 PySync
 ===
 
-![Visitor Count](https://visitor-badge.laobi.icu/badge?page_id=gscafo78.repocreate)
+![Visitor Count](https://visitor-badge.laobi.icu/badge?page_id=gscafo78.pysinc)
 [![License: GPL](https://img.shields.io/badge/License-GPL-blue.svg)](https://github.com/gscafo78/repocreate/blob/main/LICENSE)
 ![Python Version](https://img.shields.io/badge/Python-3.11.2-blue)
 [![Email](https://img.shields.io/badge/Email-giovanni.scafetta@gmx.com-blue)](mailto:giovanni.scafetta@gmx.com)
