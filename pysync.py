@@ -23,7 +23,7 @@ VERSION = "0.0.2"
 
 def parse_arguments():
   """Parse command-line arguments."""
-  parser = argparse.ArgumentParser(description="Synchronize two folders.")
+  parser = argparse.ArgumentParser(description="Clone source folder to destination folder.")
   parser.add_argument("--src", required=True, help="Source Folder")
   parser.add_argument("--dst", required=True, help="Destination Folder")
   parser.add_argument("--hash-chk", action='store_true', help="Check hash if file exists in destination")
