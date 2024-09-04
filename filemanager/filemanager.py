@@ -4,6 +4,7 @@ import logging
 from tqdm import tqdm
 import pwd
 import grp
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 def split_path(path, root):
@@ -35,28 +36,67 @@ def src2dst(src_file, src_dir, dst_dir):
   return f"{dst_dir}/{file_part}"
         
 
-
 def list_files_recursively(directory):
-    """
-    Lists all files in a directory and its subdirectories.
+  """
+  Lists all files in a directory and its subdirectories using multithreading.
 
-    Parameters:
-    directory (str): The path to the directory to list files from.
+  Parameters:
+  directory (str): The path to the directory to list files from.
 
-    Returns:
-    list: A list of file paths.
-    """
-    file_list = []
-    try:
-        for root, _, files in os.walk(directory):
-            for file in files:
-                file_path = os.path.join(root, file)
-                file_list.append(file_path)
-                logging.debug(f"File found: {file_path}")
-        logging.debug(f"Total files found: {len(file_list)}")
-    except Exception as e:
-        logging.error(f"Error listing files: {e}")
-    return file_list
+  Returns:
+  list: A list of file paths.
+  """
+  file_list = []
+  try:
+      logging.info(f"Reading files from {directory}...")
+
+      # Define a function to process each directory
+      def process_directory(root, files):
+          local_file_list = []
+          for file in files:
+              file_path = os.path.join(root, file)
+              local_file_list.append(file_path)
+              logging.debug(f"File found: {file_path}")
+          return local_file_list
+
+      # Use ThreadPoolExecutor to process directories in parallel
+      with ThreadPoolExecutor() as executor:
+          futures = []
+          for root, _, files in os.walk(directory):
+              futures.append(executor.submit(process_directory, root, files))
+
+          for future in as_completed(futures):
+              file_list.extend(future.result())
+
+      logging.debug(f"Total files found: {len(file_list)}")
+      logging.info(f"Files from {directory} have been read.")
+  except Exception as e:
+      logging.error(f"Error listing files: {e}")
+  return file_list
+
+# def list_files_recursively(directory):
+#     """
+#     Lists all files in a directory and its subdirectories.
+
+#     Parameters:
+#     directory (str): The path to the directory to list files from.
+
+#     Returns:
+#     list: A list of file paths.
+#     """
+#     file_list = []
+#     try:
+#         logging.info(f"Reading files from {directory}...")
+#         for root, _, files in os.walk(directory):
+#             for file in files:
+#                 file_path = os.path.join(root, file)
+#                 file_list.append(file_path)
+#                 logging.debug(f"File found: {file_path}")
+#         logging.debug(f"Total files found: {len(file_list)}")
+#         logging.info(f"Files from {directory} have been read.")
+#     except Exception as e:
+#         logging.error(f"Error listing files: {e}")
+#     return file_list
 
 
 def get_uid_gid(user_group):
