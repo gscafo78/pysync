@@ -1,4 +1,5 @@
 import hashlib
+import logging
 
 class HashChecker:
   def __init__(self, hash_type, file_path_a, file_path_b=None, hash_string=None):
@@ -49,14 +50,15 @@ class HashChecker:
           file_hash = hash.hexdigest()
 
           # Compare the computed hash with the provided hash string
+          logging.debug(f"Computed hash: {file_hash}")
           return file_hash == self.hash_string
       except FileNotFoundError:
           # Handle the case where the file is not found
-          print(f"File not found: {self.file_path_a}")
+          logging.error(f"File not found: {self.file_path_a}")
           return False
       except Exception as e:
           # Handle any other exceptions that may occur
-          print(f"An error occurred: {e}")
+          logging.error(f"An error occurred: {e}")
           return False
 
   def file2file(self):
@@ -92,13 +94,14 @@ class HashChecker:
                   hash_b.update(chunk)
 
           # Compare the two computed hashes
+          logging.debug(f"Computed hash: {self.file_path_a} and {self.file_path_b}")
           return hash_a.hexdigest() == hash_b.hexdigest()
 
       except FileNotFoundError as e:
           # Handle the case where one of the files is not found
-          print(f"File not found: {e.filename}")
+          logging.error(f"File not found: {e.filename}")
           return False
       except Exception as e:
           # Handle any other exceptions that may occur
-          print(f"An error occurred: {e}")
+          logging.error(f"An error occurred: {e}")
           return False

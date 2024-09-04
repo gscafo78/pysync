@@ -83,10 +83,10 @@ def main():
   Logger.setup_logging(args.verbose)
   validate_folders(args.src, args.dst)
 
-  src_files = list_files_recursively(args.src)
-  dst_files = list_files_recursively(args.dst)
-
+  
   try:
+      src_files = list_files_recursively(args.src)
+      dst_files = list_files_recursively(args.dst)
       logging.info("Starting the synchronization process...")
       start_time = time.time()  # Record the start time
 
