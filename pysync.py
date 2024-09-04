@@ -51,7 +51,7 @@ def validate_folders(src, dst):
       logging.error(f"Error: Destination folder '{dst}' does not exist.")
       sys.exit(1)
 
-def synchronize_files(args, src_files, dst_files):
+def synchronize_files(args, src_files, dst_files = None):
   """Synchronize files from source to destination."""
   fm = FileManager(args.src, args.dst)
   if args.delete:
@@ -60,7 +60,7 @@ def synchronize_files(args, src_files, dst_files):
 
   for file in src_files:
       dst_file = src2dst(file, args.src, args.dst)
-      if dst_file not in dst_files or (args.hash_chk and not HashChecker("md5", file, dst_file).file2file()):
+      if not os.path.exists(dst_file) or (args.hash_chk and not HashChecker("md5", file, dst_file).file2file()):
           copy_file(file, dst_file, args)
 
   if args.delete_after:
@@ -85,10 +85,14 @@ def main():
 
   
   try:
-      src_files = list_files_recursively(args.src)
-      dst_files = list_files_recursively(args.dst)
+      
       logging.info("Starting the synchronization process...")
       start_time = time.time()  # Record the start time
+      src_files = list_files_recursively(args.src)
+      if args.delete or args.delete_after:
+        dst_files = list_files_recursively(args.dst)
+      else:
+        dst_files = None
 
       synchronize_files(args, src_files, dst_files)
 
