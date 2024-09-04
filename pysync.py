@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import os
 import argparse
 import sys
@@ -32,6 +34,12 @@ def parse_arguments():
   parser.add_argument("--attribute", action='store_true', help="Copy files and attributes")
   parser.add_argument("--verbose", action='store_true', help="Verbose mode")
   parser.add_argument("--version", action='version', version=f"%(prog)s {VERSION}")
+
+  # Check if no arguments are provided
+  if len(sys.argv) == 1:
+      parser.print_help()
+      sys.exit(1)
+
   return parser.parse_args()
 
 def validate_folders(src, dst):
