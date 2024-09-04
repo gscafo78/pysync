@@ -74,30 +74,6 @@ def list_files_recursively(directory):
       logging.error(f"Error listing files: {e}")
   return file_list
 
-# def list_files_recursively(directory):
-#     """
-#     Lists all files in a directory and its subdirectories.
-
-#     Parameters:
-#     directory (str): The path to the directory to list files from.
-
-#     Returns:
-#     list: A list of file paths.
-#     """
-#     file_list = []
-#     try:
-#         logging.info(f"Reading files from {directory}...")
-#         for root, _, files in os.walk(directory):
-#             for file in files:
-#                 file_path = os.path.join(root, file)
-#                 file_list.append(file_path)
-#                 logging.debug(f"File found: {file_path}")
-#         logging.debug(f"Total files found: {len(file_list)}")
-#         logging.info(f"Files from {directory} have been read.")
-#     except Exception as e:
-#         logging.error(f"Error listing files: {e}")
-#     return file_list
-
 
 def get_uid_gid(user_group):
   '''
