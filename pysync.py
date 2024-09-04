@@ -5,6 +5,7 @@ import argparse
 import sys
 import time
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from filemanager.logger import Logger
 from filemanager.filemanager import FileManager, get_uid_gid, list_files_recursively, src2dst
 from filemanager.hashcheker import HashChecker
@@ -12,13 +13,13 @@ from filemanager.hashcheker import HashChecker
 
 '''
 @author: Giovanni SCAFETTA
-@version: 0.0.5
+@version: 0.0.6
 @description: This script is realized to syncronize two folders.
 @license: GLPv3
 '''
 
 
-VERSION = "0.0.5"
+VERSION = "0.0.6"
 
 
 def parse_arguments():
@@ -51,6 +52,13 @@ def validate_folders(src, dst):
       logging.error(f"Error: Destination folder '{dst}' does not exist.")
       sys.exit(1)
 
+
+def process_file(file, args):
+  dst_file = src2dst(file, args.src, args.dst)
+  if not os.path.exists(dst_file) or (args.hash_chk and not HashChecker("md5", file, dst_file).file2file()):
+      copy_file(file, dst_file, args)
+
+
 def synchronize_files(args, src_files, dst_files = None):
   """Synchronize files from source to destination."""
   fm = FileManager(args.src, args.dst)
@@ -58,10 +66,18 @@ def synchronize_files(args, src_files, dst_files = None):
       fm.remove_files_not_in_source(src_files, dst_files)
       fm.remove_empty_folders()
 
-  for file in src_files:
-      dst_file = src2dst(file, args.src, args.dst)
-      if not os.path.exists(dst_file) or (args.hash_chk and not HashChecker("md5", file, dst_file).file2file()):
-          copy_file(file, dst_file, args)
+    # Use ThreadPoolExecutor to manage a pool of threads
+  with ThreadPoolExecutor() as executor:
+      # Submit tasks to the executor for each file
+      futures = [executor.submit(process_file, file, args) for file in src_files]
+      # Optionally, wait for all futures to complete
+      for future in futures:
+          future.result()  # This will raise any exceptions caught during execution
+
+  # for file in src_files:
+  #     dst_file = src2dst(file, args.src, args.dst)
+  #     if not os.path.exists(dst_file) or (args.hash_chk and not HashChecker("md5", file, dst_file).file2file()):
+  #         copy_file(file, dst_file, args)
 
   if args.delete_after:
       fm.remove_files_not_in_source(src_files, dst_files)
