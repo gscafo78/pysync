@@ -275,7 +275,7 @@ class FileManager:
                                  dst_list):
       src_compare_list = []
       dst_compare_list = []
-      
+      logging.info(f"Starting deleting files not in source...")
       for file in src_list:
         src_compare_list.append(src2dst(file, self.src_file, "" ))
       
