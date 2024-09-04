@@ -189,7 +189,13 @@ class FileManager:
                 # Open the source and destination files
                 with open(self.src_file, 'rb') as src_file, open(self.dst_file, 'wb') as dst_file:
                     # Set up the progress bar
-                    with tqdm(total=file_size, unit='B', unit_scale=True, desc=f"{self.src_file} => {self.dst_file}", ncols=200) as pbar:
+                    with tqdm(total=file_size, 
+                              unit='B', 
+                              unit_scale=True, 
+                              desc=f"{self.dst_file}", 
+                              unit_divisor=1024) as pbar:
+                            #   ncols=200) as pbar:
+                        
                         # Read and write the file in chunks
                         for chunk in iter(lambda: src_file.read(1024 * 1024), b''):
                             dst_file.write(chunk)
