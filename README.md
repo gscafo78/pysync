@@ -1,1 +1,1 @@
-# pyrsync
+# pysync
