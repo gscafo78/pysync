@@ -45,43 +45,6 @@ def ch_own(root_dir,chown_list = None):
                 except Exception as e:
                     logging.error(f"Failed to change user or group for {dir_path}: {e}")
         
-    
-    
-    
-    
-    
-    # dst_dir = os.path.dirname(self.dst_file)
-    # list_dst_dir = dst_dir.split('/')[1:]
-    # list_root = self.root_dir.split('/')[1:]
-    # for i in range(len(list_dst_dir), len(list_root) + 1):
-    #     current_path = "/".join(list_root[:i])
-    #     logging.debug(f"Current path: {current_path}")
-
-    # # for root, dirs in os.walk(dst_dir):
-    #     for dir_name in dirs:
-    #         dir_path = os.path.join(root, dir_name)
-    #         logging.debug(f"Processing directory: {dir_path}")
-            
-    #         if self.group is not None:
-    #             try:
-    #                 os.chown(dir_path, -1, self.group)
-    #                 logging.debug(f"Group ID {self.group} applied to: {dir_path}")
-    #             except Exception as e:
-    #                 logging.error(f"Failed to change group for {dir_path}: {e}")
-            
-    #         if self.owner is not None:
-    #             try:
-    #                 os.chown(dir_path, self.owner, -1)
-    #                 logging.debug(f"Owner ID {self.owner} applied to: {dir_path}")
-    #             except Exception as e:
-    #                 logging.error(f"Failed to change owner for {dir_path}: {e}")
-
-# except Exception as e:
-#     logging.error(f"Error creating directories: {e}")
-    
-
-
-
 
 def src2dst(src_file, src_dir, dst_dir):
   '''
@@ -200,133 +163,14 @@ class FileManager:
       self.owner =  owner
       self.root_dir = root_dir
 
-    #   self.attributes = {}  # Dictionary to store file attributes
-      # logging.debug(f"FileManager initialized with source: {src_file} and destination: {dst_file}")
-
-#   def read_file_attributes(self):
-#       """
-#       Reads and stores specific attributes of the source file based on the provided flags.
-#       """
-      
-#       try:
-#           # Preserve permissions
-#           if self.preserve_permissions:
-#               self.attributes['permissions'] = os.stat(self.src_file).st_mode
-#               logging.debug(f"Permissions preserved: {self.attributes['permissions']}")
-          
-#           # Preserve access and modification times
-#           if self.preserve_times:
-#               self.attributes['access_time'] = os.path.getatime(self.src_file)
-#               self.attributes['modification_time'] = os.path.getmtime(self.src_file)
-#               logging.debug(f"Access time preserved: {self.attributes['access_time']}, Modification time preserved: {self.attributes['modification_time']}")
-          
-#           # group ID
-#           if self.group is not None:
-#               self.attributes['group'] = self.group
-#               logging.debug(f"New Group ID: {self.attributes['group']}")
-
-#           # owner ID
-#           if self.owner is not None:
-#               self.attributes['owner'] = self.owner
-#               logging.debug(f"New Owner ID: {self.attributes['owner']}")
-      
-#       except Exception as e:
-#           logging.error(f"Error reading file attributes: {e}")
-#           self.attributes = {}  # Reset attributes if an error occurs
-
-
-
-#   def mkfolder(self, dst_dir):
-#     os.makedirs(dst_dir, exist_ok=True)
-#     for root, dirs, files in os.walk(dst_dir):
-#         for dir_name in dirs:
-#             dir_path = os.path.join(root, dir_name)
-#             if self.group is not None:
-#                 os.chown(dir_path, -1, self.group)
-#                 logging.debug(f"Group ID applied: {dir_path}")
-            
-#             # Apply preserved owner ID
-#             if self.owner is not None:
-#                 os.chown(dir_path, self.owner, -1)
-#                 logging.debug(f"Owner ID applied: {dir_path}")
-
-
-#   def ch_own(self):
-#     # try:
-#         subfolders = []
-#         for root, dirs, in os.walk(self.root_dir):
-#             for dir_name in dirs:
-#                 subfolders.append(os.path.join(root, dir_name))
-        
-        
-        
-        
-        
-#         # logging.debug(f"{self.dst_file} - {self.group} - {self.owner}")        
-#         # dst_dir = os.path.dirname(self.dst_file)
-#         # list_dst_dir = dst_dir.split('/')[1:]
-#         # list_root = self.root_dir.split('/')[1:]
-#         # for i in range(len(list_dst_dir), len(list_root) + 1):
-#         #     current_path = "/".join(list_root[:i])
-#         #     logging.debug(f"Current path: {current_path}")
-
-#         # # for root, dirs in os.walk(dst_dir):
-#         #     for dir_name in dirs:
-#         #         dir_path = os.path.join(root, dir_name)
-#         #         logging.debug(f"Processing directory: {dir_path}")
-                
-#         #         if self.group is not None:
-#         #             try:
-#         #                 os.chown(dir_path, -1, self.group)
-#         #                 logging.debug(f"Group ID {self.group} applied to: {dir_path}")
-#         #             except Exception as e:
-#         #                 logging.error(f"Failed to change group for {dir_path}: {e}")
-                
-#         #         if self.owner is not None:
-#         #             try:
-#         #                 os.chown(dir_path, self.owner, -1)
-#         #                 logging.debug(f"Owner ID {self.owner} applied to: {dir_path}")
-#         #             except Exception as e:
-#         #                 logging.error(f"Failed to change owner for {dir_path}: {e}")
-
-#     # except Exception as e:
-#     #     logging.error(f"Error creating directories: {e}")
-        
-
-
 
   def copy_file(self):
     """
     Copies the source file to the destination path, preserving metadata, with a progress bar.
     """
     try:
-        # Step 1: Extract directory paths
         dst_dir = os.path.dirname(self.dst_file)
-        # self.mkfolder()
-        # Step 3: Check and create destination directory if it doesn't exist
-        # if not os.path.exists(dst_dir):
-        #     logging.debug(f"Create Folder: {dst_dir}")
-        #     self.mkfolder(dst_dir)
         os.makedirs(dst_dir, exist_ok=True)
-
-            # if (self.group is not None) or (self.owner is not None) :
-            #     self.ch_own()
-
-            # # string_to_remove = "World"
-            # # result = self.dst_file.replace(string_to_remove, "")
-            # for root, dirs, files in os.walk(dst_dir):
-            #     for dir_name in dirs:
-            #         dir_path = os.path.join(root, dir_name)
-            #         if self.group is not None:
-            #             os.chown(dir_path, -1, self.group)
-            #             logging.debug(f"Group ID applied: {dir_path}")
-                    
-            #         # Apply preserved owner ID
-            #         if self.owner is not None:
-            #             os.chown(dir_path, self.owner, -1)
-            #             logging.debug(f"Owner ID applied: {dir_path}")
-
-        # Step 4: Copy the file with progress bar if enabled
         if self.status_bar:
             try:
                 # Determine the size of the source file
@@ -335,10 +179,10 @@ class FileManager:
                 # Open the source and destination files
                 with open(self.src_file, 'rb') as src_file, open(self.dst_file, 'wb') as dst_file:
                     # Set up the progress bar
-                    if len(self.dst_file) > 120:
-                        description = f"...{self.dst_file[-117:]}"
+                    if len(self.dst_file) > 110:
+                        description = f"...{self.dst_file[-107:]}"
                     else:
-                        description = f"{self.dst_file[-120:]}"
+                        description = f"{self.dst_file[-110:]}"
 
                     with tqdm(total=file_size, 
                               unit='B', 
@@ -346,7 +190,7 @@ class FileManager:
                               desc=f"{description}", 
                             #   desc=f"{self.dst_file.split('/')[-1]}", 
                               unit_divisor=1024,
-                              bar_format="{desc:<120}\t{bar}\t[ {n_fmt:>5}/{total_fmt:>5} | {percentage:>6.2f} % | {rate_fmt:>8} ]",
+                              bar_format="{desc:<110} {bar} [ {n_fmt:>5}/{total_fmt:>5} | {percentage:>6.2f} % | {rate_fmt:>8} ]",
                               dynamic_ncols = True) as pbar:
                             #   ncols=220) as pbar:
                         
@@ -355,8 +199,6 @@ class FileManager:
                             dst_file.write(chunk)
                             pbar.update(len(chunk))
 
-                # Copy file metadata
-                # shutil.copystat(self.src_file, self.dst_file)
                 logging.debug(f"File copied from {self.src_file} to {self.dst_file}")
 
             except Exception as e:
@@ -388,27 +230,7 @@ class FileManager:
     except Exception as e:
         logging.error(f"Error setting up directories: {e}")
 
-  
-#   def apply_user_group(self):
-#       """
-#       Applies the stored attributes to the destination file.
-#       """
-#       try:
-          
-#           # Apply preserved group ID
-#           if self.group is not None:
-#               os.chown(self.dst_file, -1, self.group)
-#               logging.debug(f"Group ID applied: {self.group}")
-          
-#           # Apply preserved owner ID
-#           if self.owner is not None:
-#               os.chown(self.dst_file, self.owner, -1)
-#               logging.debug(f"Owner ID applied: {self.owner}")
 
-#       except Exception as e:
-#           logging.error(f"Error applying attributes to file: {e}")
-
-  
   def remove_empty_folders(self):
     """Recursively remove empty folders from the specified path."""
     # Check if the path is a directory

@@ -13,13 +13,13 @@ from filemanager.hashcheker import HashChecker
 
 '''
 @author: Giovanni SCAFETTA
-@version: 0.0.7
+@version: 0.0.8
 @description: This script is realized to syncronize two folders.
 @license: GLPv3
 '''
 
 
-VERSION = "0.0.7"
+VERSION = "0.0.8"
 
 
 def parse_arguments():
@@ -74,11 +74,6 @@ def synchronize_files(args, src_files, dst_files = None):
       for future in futures:
           future.result()  # This will raise any exceptions caught during execution
 
-  # for file in src_files:
-  #     dst_file = src2dst(file, args.src, args.dst)
-  #     if not os.path.exists(dst_file) or (args.hash_chk and not HashChecker("md5", file, dst_file).file2file()):
-  #         copy_file(file, dst_file, args)
-
   if args.delete_after:
       fm.remove_files_not_in_source(src_files, dst_files)
       fm.remove_empty_folders()
@@ -93,15 +88,7 @@ def copy_file_(src_file, dst_file, args):
                    owner=get_uid_gid(args.chown)[0] if args.chown else None,
                    status_bar=args.progress)
 
-  # fm = FileManager(src_file, dst_file, preserve_permissions=args.attribute, preserve_times=args.attribute,
-  #                  group=get_uid_gid(args.chown)[1] if args.chown else None,
-  #                  owner=get_uid_gid(args.chown)[0] if args.chown else None,
-  #                  status_bar=args.progress)
-
-  # fm.read_file_attributes()
   fm.copy_file()
-  # fm.apply_user_group()
-  # fm.apply_attributes_to_file()
 
 
 
