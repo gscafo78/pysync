@@ -28,6 +28,61 @@ def split_path(path, root):
   return result
 
 
+def ch_own(root_dir,chown_list = None):
+    """
+    Changes the owner and group of a file or directory.
+    """
+    if chown_list is not None:
+        gid=get_uid_gid(chown_list)[1]
+        uid=get_uid_gid(chown_list)[0]
+        for root, dirs, files in os.walk(root_dir):
+            for dir_name in dirs:
+                dir_path = os.path.join(root, dir_name)
+                logging.debug(f"subfolders: {dir_path}")
+                try:
+                    os.chown(dir_path, uid, gid)
+                    logging.debug(f"User ID {uid}, Group ID {gid} applied to: {dir_path}")
+                except Exception as e:
+                    logging.error(f"Failed to change user or group for {dir_path}: {e}")
+        
+    
+    
+    
+    
+    
+    # dst_dir = os.path.dirname(self.dst_file)
+    # list_dst_dir = dst_dir.split('/')[1:]
+    # list_root = self.root_dir.split('/')[1:]
+    # for i in range(len(list_dst_dir), len(list_root) + 1):
+    #     current_path = "/".join(list_root[:i])
+    #     logging.debug(f"Current path: {current_path}")
+
+    # # for root, dirs in os.walk(dst_dir):
+    #     for dir_name in dirs:
+    #         dir_path = os.path.join(root, dir_name)
+    #         logging.debug(f"Processing directory: {dir_path}")
+            
+    #         if self.group is not None:
+    #             try:
+    #                 os.chown(dir_path, -1, self.group)
+    #                 logging.debug(f"Group ID {self.group} applied to: {dir_path}")
+    #             except Exception as e:
+    #                 logging.error(f"Failed to change group for {dir_path}: {e}")
+            
+    #         if self.owner is not None:
+    #             try:
+    #                 os.chown(dir_path, self.owner, -1)
+    #                 logging.debug(f"Owner ID {self.owner} applied to: {dir_path}")
+    #             except Exception as e:
+    #                 logging.error(f"Failed to change owner for {dir_path}: {e}")
+
+# except Exception as e:
+#     logging.error(f"Error creating directories: {e}")
+    
+
+
+
+
 def src2dst(src_file, src_dir, dst_dir):
   '''
   Converts a source file path to a destination file path.
@@ -77,18 +132,40 @@ def list_files_recursively(directory):
 
 
 def get_uid_gid(user_group):
-  '''
-  Pass user and group name and return uid and gid, ex. www-data:www-data
-  '''
-  try:
-      user, group = user_group.split(':')
-      uid = pwd.getpwnam(user).pw_uid
-      gid = grp.getgrnam(group).gr_gid
-      return uid, gid
-  except KeyError as e:
-      return f"Error: {e} not found"
-  except ValueError:
-      return "Error: Input should be in 'user:group' format"
+    '''
+    Pass user and group name and return uid and gid, ex. www-data:www-data
+    '''
+    try:
+        parts = user_group.split(':')
+        
+        # Initialize uid and gid
+        uid = None
+        gid = None
+        
+        # Assign values based on the number of parts
+        if len(parts) == 2:
+            user, group = parts[0] or None, parts[1] or None
+        elif len(parts) == 1:
+            user = parts[0] or None
+            group = None
+        else:
+            raise ValueError("Input should be in 'user:group' format")
+        
+        if user is not None:
+            uid = pwd.getpwnam(user).pw_uid
+        else:
+            uid = -1
+        if group is not None:
+            gid = grp.getgrnam(group).gr_gid
+        else:
+            gid = -1
+        
+        return uid, gid
+    
+    except KeyError as e:
+        return f"Error: {e} not found"
+    except ValueError as ve:
+        return f"Error: {ve}"
 
 
 class FileManager:
@@ -99,8 +176,8 @@ class FileManager:
   def __init__(self, 
                src_file,
                dst_file, 
+               root_dir = None,
                preserve_permissions = False, 
-               preserve_times = False, 
                group = None, 
                owner = None, 
                status_bar = False):
@@ -111,7 +188,6 @@ class FileManager:
       src_file (str): The path to the source file.
       dst_file (str): The path to the destination file.
       preserve_permissions (bool): If True, preserves the file's permissions.
-      preserve_times (bool): If True, preserves the file's access and modification times.
       group (int): Change the file's group ID
       owner (int): Change the file's owner ID.
   
@@ -120,43 +196,103 @@ class FileManager:
       self.dst_file = dst_file
       self.status_bar = status_bar
       self.preserve_permissions = preserve_permissions 
-      self.preserve_times = preserve_times 
       self.group =  group 
       self.owner =  owner
+      self.root_dir = root_dir
 
-      self.attributes = {}  # Dictionary to store file attributes
+    #   self.attributes = {}  # Dictionary to store file attributes
       # logging.debug(f"FileManager initialized with source: {src_file} and destination: {dst_file}")
 
-  def read_file_attributes(self):
-      """
-      Reads and stores specific attributes of the source file based on the provided flags.
-      """
+#   def read_file_attributes(self):
+#       """
+#       Reads and stores specific attributes of the source file based on the provided flags.
+#       """
       
-      try:
-          # Preserve permissions
-          if self.preserve_permissions:
-              self.attributes['permissions'] = os.stat(self.src_file).st_mode
-              logging.debug(f"Permissions preserved: {self.attributes['permissions']}")
+#       try:
+#           # Preserve permissions
+#           if self.preserve_permissions:
+#               self.attributes['permissions'] = os.stat(self.src_file).st_mode
+#               logging.debug(f"Permissions preserved: {self.attributes['permissions']}")
           
-          # Preserve access and modification times
-          if self.preserve_times:
-              self.attributes['access_time'] = os.path.getatime(self.src_file)
-              self.attributes['modification_time'] = os.path.getmtime(self.src_file)
-              logging.debug(f"Access time preserved: {self.attributes['access_time']}, Modification time preserved: {self.attributes['modification_time']}")
+#           # Preserve access and modification times
+#           if self.preserve_times:
+#               self.attributes['access_time'] = os.path.getatime(self.src_file)
+#               self.attributes['modification_time'] = os.path.getmtime(self.src_file)
+#               logging.debug(f"Access time preserved: {self.attributes['access_time']}, Modification time preserved: {self.attributes['modification_time']}")
           
-          # group ID
-          if self.group is not None:
-              self.attributes['group'] = self.group
-              logging.debug(f"New Group ID: {self.attributes['group']}")
+#           # group ID
+#           if self.group is not None:
+#               self.attributes['group'] = self.group
+#               logging.debug(f"New Group ID: {self.attributes['group']}")
 
-          # owner ID
-          if self.owner is not None:
-              self.attributes['owner'] = self.owner
-              logging.debug(f"New Owner ID: {self.attributes['owner']}")
+#           # owner ID
+#           if self.owner is not None:
+#               self.attributes['owner'] = self.owner
+#               logging.debug(f"New Owner ID: {self.attributes['owner']}")
       
-      except Exception as e:
-          logging.error(f"Error reading file attributes: {e}")
-          self.attributes = {}  # Reset attributes if an error occurs
+#       except Exception as e:
+#           logging.error(f"Error reading file attributes: {e}")
+#           self.attributes = {}  # Reset attributes if an error occurs
+
+
+
+#   def mkfolder(self, dst_dir):
+#     os.makedirs(dst_dir, exist_ok=True)
+#     for root, dirs, files in os.walk(dst_dir):
+#         for dir_name in dirs:
+#             dir_path = os.path.join(root, dir_name)
+#             if self.group is not None:
+#                 os.chown(dir_path, -1, self.group)
+#                 logging.debug(f"Group ID applied: {dir_path}")
+            
+#             # Apply preserved owner ID
+#             if self.owner is not None:
+#                 os.chown(dir_path, self.owner, -1)
+#                 logging.debug(f"Owner ID applied: {dir_path}")
+
+
+#   def ch_own(self):
+#     # try:
+#         subfolders = []
+#         for root, dirs, in os.walk(self.root_dir):
+#             for dir_name in dirs:
+#                 subfolders.append(os.path.join(root, dir_name))
+        
+        
+        
+        
+        
+#         # logging.debug(f"{self.dst_file} - {self.group} - {self.owner}")        
+#         # dst_dir = os.path.dirname(self.dst_file)
+#         # list_dst_dir = dst_dir.split('/')[1:]
+#         # list_root = self.root_dir.split('/')[1:]
+#         # for i in range(len(list_dst_dir), len(list_root) + 1):
+#         #     current_path = "/".join(list_root[:i])
+#         #     logging.debug(f"Current path: {current_path}")
+
+#         # # for root, dirs in os.walk(dst_dir):
+#         #     for dir_name in dirs:
+#         #         dir_path = os.path.join(root, dir_name)
+#         #         logging.debug(f"Processing directory: {dir_path}")
+                
+#         #         if self.group is not None:
+#         #             try:
+#         #                 os.chown(dir_path, -1, self.group)
+#         #                 logging.debug(f"Group ID {self.group} applied to: {dir_path}")
+#         #             except Exception as e:
+#         #                 logging.error(f"Failed to change group for {dir_path}: {e}")
+                
+#         #         if self.owner is not None:
+#         #             try:
+#         #                 os.chown(dir_path, self.owner, -1)
+#         #                 logging.debug(f"Owner ID {self.owner} applied to: {dir_path}")
+#         #             except Exception as e:
+#         #                 logging.error(f"Failed to change owner for {dir_path}: {e}")
+
+#     # except Exception as e:
+#     #     logging.error(f"Error creating directories: {e}")
+        
+
 
 
   def copy_file(self):
@@ -166,19 +302,29 @@ class FileManager:
     try:
         # Step 1: Extract directory paths
         dst_dir = os.path.dirname(self.dst_file)
-
+        # self.mkfolder()
         # Step 3: Check and create destination directory if it doesn't exist
-        if not os.path.exists(dst_dir):
-            os.makedirs(dst_dir)
-            # Apply preserved group ID
-            if 'group' in self.attributes:
-                os.chown(dst_dir, -1, self.attributes['group'])
-                logging.debug(f"Group ID applied: {self.attributes['group']}")
-          
-            # Apply preserved owner ID
-            if 'owner' in self.attributes:
-                os.chown(dst_dir, self.attributes['owner'], -1)
-                logging.debug(f"Destination directory created: {dst_dir}")
+        # if not os.path.exists(dst_dir):
+        #     logging.debug(f"Create Folder: {dst_dir}")
+        #     self.mkfolder(dst_dir)
+        os.makedirs(dst_dir, exist_ok=True)
+
+            # if (self.group is not None) or (self.owner is not None) :
+            #     self.ch_own()
+
+            # # string_to_remove = "World"
+            # # result = self.dst_file.replace(string_to_remove, "")
+            # for root, dirs, files in os.walk(dst_dir):
+            #     for dir_name in dirs:
+            #         dir_path = os.path.join(root, dir_name)
+            #         if self.group is not None:
+            #             os.chown(dir_path, -1, self.group)
+            #             logging.debug(f"Group ID applied: {dir_path}")
+                    
+            #         # Apply preserved owner ID
+            #         if self.owner is not None:
+            #             os.chown(dir_path, self.owner, -1)
+            #             logging.debug(f"Owner ID applied: {dir_path}")
 
         # Step 4: Copy the file with progress bar if enabled
         if self.status_bar:
@@ -189,12 +335,20 @@ class FileManager:
                 # Open the source and destination files
                 with open(self.src_file, 'rb') as src_file, open(self.dst_file, 'wb') as dst_file:
                     # Set up the progress bar
+                    if len(self.dst_file) > 120:
+                        description = f"...{self.dst_file[-117:]}"
+                    else:
+                        description = f"{self.dst_file[-120:]}"
+
                     with tqdm(total=file_size, 
                               unit='B', 
                               unit_scale=True, 
-                              desc=f"{self.dst_file.split('/')[-1]}", 
-                              unit_divisor=1024) as pbar:
-                            #   ncols=200) as pbar:
+                              desc=f"{description}", 
+                            #   desc=f"{self.dst_file.split('/')[-1]}", 
+                              unit_divisor=1024,
+                              bar_format="{desc:<120}\t{bar}\t[ {n_fmt:>5}/{total_fmt:>5} | {percentage:>6.2f} % | {rate_fmt:>8} ]",
+                              dynamic_ncols = True) as pbar:
+                            #   ncols=220) as pbar:
                         
                         # Read and write the file in chunks
                         for chunk in iter(lambda: src_file.read(1024 * 1024), b''):
@@ -202,7 +356,7 @@ class FileManager:
                             pbar.update(len(chunk))
 
                 # Copy file metadata
-                shutil.copystat(self.src_file, self.dst_file)
+                # shutil.copystat(self.src_file, self.dst_file)
                 logging.debug(f"File copied from {self.src_file} to {self.dst_file}")
 
             except Exception as e:
@@ -215,39 +369,45 @@ class FileManager:
                 logging.info(f"{self.src_file} => {self.dst_file}")
             except Exception as e:
                 logging.error(f"Error copying file: {e}")
+        
+        if self.preserve_permissions: 
+            shutil.copystat(self.src_file, self.dst_file)
+            logging.debug(f"Permissions applied: {self.dst_file}")
+
+        # Apply preserved group ID
+        if self.group is not None:
+            os.chown(self.dst_file, -1, self.group)
+            logging.debug(f"Group ID applied: {self.dst_file}")
+        
+        # Apply preserved owner ID
+        if self.owner is not None:
+            os.chown(self.dst_file, self.owner, -1)
+            logging.debug(f"Owner ID applied: {self.dst_file}")
+            
 
     except Exception as e:
         logging.error(f"Error setting up directories: {e}")
 
+  
+#   def apply_user_group(self):
+#       """
+#       Applies the stored attributes to the destination file.
+#       """
+#       try:
+          
+#           # Apply preserved group ID
+#           if self.group is not None:
+#               os.chown(self.dst_file, -1, self.group)
+#               logging.debug(f"Group ID applied: {self.group}")
+          
+#           # Apply preserved owner ID
+#           if self.owner is not None:
+#               os.chown(self.dst_file, self.owner, -1)
+#               logging.debug(f"Owner ID applied: {self.owner}")
 
-  def apply_attributes_to_file(self):
-      """
-      Applies the stored attributes to the destination file.
-      """
-      try:
-          # Apply preserved permissions
-          if 'permissions' in self.attributes:
-              os.chmod(self.dst_file, self.attributes['permissions'])
-              logging.debug(f"Permissions applied: {self.attributes['permissions']}")
-          
-          # Apply preserved access and modification times
-          if 'access_time' in self.attributes and 'modification_time' in self.attributes:
-              os.utime(self.dst_file, (self.attributes['access_time'], self.attributes['modification_time']))
-              logging.debug(f"Access and modification times applied: {self.attributes['access_time']}, {self.attributes['modification_time']}")
-          
-          # Apply preserved group ID
-          if 'group' in self.attributes:
-              os.chown(self.dst_file, -1, self.attributes['group'])
-              logging.debug(f"Group ID applied: {self.attributes['group']}")
-          
-          # Apply preserved owner ID
-          if 'owner' in self.attributes:
-              os.chown(self.dst_file, self.attributes['owner'], -1)
-              logging.debug(f"Owner ID applied: {self.attributes['owner']}")
-          
-          logging.debug(f"Attributes applied to {self.dst_file}")
-      except Exception as e:
-          logging.error(f"Error applying attributes to file: {e}")
+#       except Exception as e:
+#           logging.error(f"Error applying attributes to file: {e}")
+
   
   def remove_empty_folders(self):
     """Recursively remove empty folders from the specified path."""
