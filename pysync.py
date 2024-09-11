@@ -13,13 +13,13 @@ from filemanager.hashcheker import HashChecker
 
 '''
 @author: Giovanni SCAFETTA
-@version: 0.0.8
+@version: 0.0.9
 @description: This script is realized to syncronize two folders.
 @license: GLPv3
 '''
 
 
-VERSION = "0.0.8"
+VERSION = "0.0.9"
 
 
 def parse_arguments():
