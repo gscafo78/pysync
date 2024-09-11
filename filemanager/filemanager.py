@@ -7,6 +7,10 @@ import grp
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
+
+
+
+
 def split_path(path, root):
   """
   Splits a path into its directory and filename components,
@@ -129,6 +133,31 @@ def get_uid_gid(user_group):
         return f"Error: {e} not found"
     except ValueError as ve:
         return f"Error: {ve}"
+    
+
+def sizes_equal(file_path1, file_path2):
+  """
+  Returns True if the sizes of the two files are equal, False otherwise.
+
+  Args:
+      file_path1 (str): Path to the first file.
+      file_path2 (str): Path to the second file.
+
+  Returns:
+      bool: Whether the file sizes are equal.
+  """
+  try:
+      size1 = os.path.getsize(file_path1)
+      size2 = os.path.getsize(file_path2)
+      if size1 == size2:
+          logging.debug("the file sizes are equal")    
+          return True
+      else:
+          logging.debug("the file sizes aren't equal")    
+          return False
+  except FileNotFoundError:
+      logging.error("One or both files not found.")
+      return False
 
 
 class FileManager:

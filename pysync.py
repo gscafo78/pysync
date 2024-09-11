@@ -7,7 +7,7 @@ import time
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from filemanager.logger import Logger
-from filemanager.filemanager import FileManager, get_uid_gid, list_files_recursively, src2dst, ch_own
+from filemanager.filemanager import FileManager, get_uid_gid, list_files_recursively, src2dst, ch_own, sizes_equal
 from filemanager.hashcheker import HashChecker
 
 
@@ -55,8 +55,15 @@ def validate_folders(src, dst):
 
 def process_file(file, args):
   dst_file = src2dst(file, args.src, args.dst)
-  if not os.path.exists(dst_file) or (args.hash_chk and not HashChecker("md5", file, dst_file).file2file()):
-      copy_file_(file, dst_file, args)
+  
+  if os.path.exists(dst_file):
+    if (args.hash_chk):
+      if HashChecker("md5", file, dst_file).file2file():
+        return
+    elif sizes_equal(file, dst_file):
+      return
+    
+  copy_file_(file, dst_file, args)
 
 
 def synchronize_files(args, src_files, dst_files = None):
