@@ -7,19 +7,19 @@ import time
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from filemanager.logger import Logger
-from filemanager.filemanager import FileManager, get_uid_gid, list_files_recursively, src2dst, ch_own, sizes_equal
+from filemanager.filemanager import FileManager, get_uid_gid, list_files_recursively, src2dst, ch_own, files_match
 from filemanager.hashcheker import HashChecker
 
 
 '''
 @author: Giovanni SCAFETTA
-@version: 0.0.9
+@version: 0.0.10
 @description: This script is realized to syncronize two folders.
 @license: GLPv3
 '''
 
 
-VERSION = "0.0.9"
+VERSION = "0.0.10"
 
 
 def parse_arguments():
@@ -60,7 +60,7 @@ def process_file(file, args):
     if (args.hash_chk):
       if HashChecker("md5", file, dst_file).file2file():
         return
-    elif sizes_equal(file, dst_file):
+    elif files_match(file, dst_file):
       return
     
   copy_file_(file, dst_file, args)

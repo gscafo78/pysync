@@ -135,29 +135,59 @@ def get_uid_gid(user_group):
         return f"Error: {ve}"
     
 
-def sizes_equal(file_path1, file_path2):
+
+def files_match(file_path1, file_path2):
   """
-  Returns True if the sizes of the two files are equal, False otherwise.
+  Returns True if the sizes and creation times of the two files are equal, False otherwise.
 
   Args:
       file_path1 (str): Path to the first file.
       file_path2 (str): Path to the second file.
 
   Returns:
-      bool: Whether the file sizes are equal.
+      bool: Whether the file sizes and creation times are equal.
   """
   try:
-      size1 = os.path.getsize(file_path1)
-      size2 = os.path.getsize(file_path2)
-      if size1 == size2:
-          logging.debug("the file sizes are equal")    
+      stat1 = os.stat(file_path1)
+      stat2 = os.stat(file_path2)
+      size1 = stat1.st_size
+      size2 = stat2.st_size
+      ctime1 = stat1.st_ctime
+      ctime2 = stat2.st_ctime
+      if size1 == size2 and ctime1 == ctime2:
+          logging.debug("the file sizes and creation times are equal")
           return True
       else:
-          logging.debug("the file sizes aren't equal")    
+          logging.debug("the file sizes or creation times aren't equal")
           return False
   except FileNotFoundError:
       logging.error("One or both files not found.")
       return False
+
+
+# def sizes_equal(file_path1, file_path2):
+#   """
+#   Returns True if the sizes of the two files are equal, False otherwise.
+
+#   Args:
+#       file_path1 (str): Path to the first file.
+#       file_path2 (str): Path to the second file.
+
+#   Returns:
+#       bool: Whether the file sizes are equal.
+#   """
+#   try:
+#       size1 = os.path.getsize(file_path1)
+#       size2 = os.path.getsize(file_path2)
+#       if size1 == size2:
+#           logging.debug("the file sizes are equal")    
+#           return True
+#       else:
+#           logging.debug("the file sizes aren't equal")    
+#           return False
+#   except FileNotFoundError:
+#       logging.error("One or both files not found.")
+#       return False
 
 
 class FileManager:
