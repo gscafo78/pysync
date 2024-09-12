@@ -152,9 +152,9 @@ def files_match(file_path1, file_path2):
       stat2 = os.stat(file_path2)
       size1 = stat1.st_size
       size2 = stat2.st_size
-      ctime1 = stat1.st_ctime
-      ctime2 = stat2.st_ctime
-      if size1 == size2 and ctime1 == ctime2:
+      atime1 = stat1.st_atime
+      atime2 = stat2.st_atime
+      if size1 == size2 and atime1 == atime2:
           logging.debug("the file sizes and creation times are equal")
           return True
       else:
@@ -221,6 +221,34 @@ class FileManager:
       self.group =  group 
       self.owner =  owner
       self.root_dir = root_dir
+
+#   def copy_metadata(self):
+#     # Define the source and destination file paths
+#     src_file = self.src_file
+#     dst_file = self.dst_file
+
+#     # Get the original file's timestamps
+#     stat_info = os.stat(src_file)
+#     atime = stat_info.st_atime
+#     mtime = stat_info.st_mtime
+#     ctime = stat_info.st_ctime
+
+#     # Try to get the birth time (not available on all platforms)
+#     try:
+#         birthtime = stat_info.st_birthtime
+#     except AttributeError:
+#         birthtime = None
+
+#     # Set the timestamps of the destination file
+#     os.utime(dst_file, (atime, mtime))
+
+#     # If birth time is available, try to set it (not possible on all platforms)
+#     if birthtime is not None:
+#         try:
+#             os.utime(dst_file, (birthtime, birthtime))
+#         except OSError:
+#             pass  # Setting birth time not supported on this platform
+
 
 
   def copy_file(self):
