@@ -222,32 +222,32 @@ class FileManager:
       self.owner =  owner
       self.root_dir = root_dir
 
-#   def copy_metadata(self):
-#     # Define the source and destination file paths
-#     src_file = self.src_file
-#     dst_file = self.dst_file
+  def copy_metadata(self):
+    # Define the source and destination file paths
+    src_file = self.src_file
+    dst_file = self.dst_file
 
-#     # Get the original file's timestamps
-#     stat_info = os.stat(src_file)
-#     atime = stat_info.st_atime
-#     mtime = stat_info.st_mtime
-#     ctime = stat_info.st_ctime
+    # Get the original file's timestamps
+    stat_info = os.stat(src_file)
+    atime = stat_info.st_atime
+    mtime = stat_info.st_mtime
+    ctime = stat_info.st_ctime
 
-#     # Try to get the birth time (not available on all platforms)
-#     try:
-#         birthtime = stat_info.st_birthtime
-#     except AttributeError:
-#         birthtime = None
+    # Try to get the birth time (not available on all platforms)
+    try:
+        birthtime = stat_info.st_birthtime
+    except AttributeError:
+        birthtime = None
 
-#     # Set the timestamps of the destination file
-#     os.utime(dst_file, (atime, mtime))
+    # Set the timestamps of the destination file
+    os.utime(dst_file, (atime, mtime))
 
-#     # If birth time is available, try to set it (not possible on all platforms)
-#     if birthtime is not None:
-#         try:
-#             os.utime(dst_file, (birthtime, birthtime))
-#         except OSError:
-#             pass  # Setting birth time not supported on this platform
+    # If birth time is available, try to set it (not possible on all platforms)
+    if birthtime is not None:
+        try:
+            os.utime(dst_file, (birthtime, birthtime))
+        except OSError:
+            pass  # Setting birth time not supported on this platform
 
 
 
