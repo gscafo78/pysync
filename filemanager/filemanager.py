@@ -8,9 +8,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 
-
-
-
 def split_path(path, root):
   """
   Splits a path into its directory and filename components,

@@ -8,19 +8,19 @@ import logging
 import filecmp
 from concurrent.futures import ThreadPoolExecutor
 from filemanager.logger import Logger
-from filemanager.filemanager import FileManager, get_uid_gid, list_files_recursively, src2dst, ch_own, files_match
-from filemanager.hashcheker import HashChecker
+from filemanager.filemanager import FileManager, get_uid_gid, list_files_recursively, src2dst, ch_own
+# from filemanager.hashcheker import HashChecker
 
 
 '''
 @author: Giovanni SCAFETTA
-@version: 0.0.12
+@version: 0.0.13
 @description: This script is realized to syncronize two folders.
 @license: GLPv3
 '''
 
 
-VERSION = "0.0.12"
+VERSION = "0.0.13"
 
 
 def parse_arguments():
@@ -58,11 +58,14 @@ def process_file(file, args):
   dst_file = src2dst(file, args.src, args.dst)
   
   if os.path.exists(dst_file):
-    if (args.hash_chk):
-      if HashChecker("md5", file, dst_file).file2file():
-        return
-    elif filecmp.cmp(file, dst_file, shallow=False):
-      return
+    filecmp.cmp(file, dst_file, shallow=args.hash_chk)
+    return
+    # if (args.hash_chk):
+
+    #   if HashChecker("md5", file, dst_file).file2file():
+    #     return
+    # elif filecmp.cmp(file, dst_file, shallow=False):
+    #   return
     
   copy_file_(file, dst_file, args)
 
