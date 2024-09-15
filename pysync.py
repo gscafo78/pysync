@@ -14,13 +14,13 @@ from filemanager.filemanager import FileManager, get_uid_gid, list_files_recursi
 
 '''
 @author: Giovanni SCAFETTA
-@version: 0.0.13
+@version: 0.0.14
 @description: This script is realized to syncronize two folders.
 @license: GLPv3
 '''
 
 
-VERSION = "0.0.13"
+VERSION = "0.0.14"
 
 
 def parse_arguments():
@@ -58,7 +58,7 @@ def process_file(file, args):
   dst_file = src2dst(file, args.src, args.dst)
   
   if os.path.exists(dst_file):
-    filecmp.cmp(file, dst_file, shallow=args.hash_chk)
+    filecmp.cmp(file, dst_file, shallow=not args.hash_chk)
     return
     # if (args.hash_chk):
 
